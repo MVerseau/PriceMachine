@@ -19,6 +19,7 @@ class PriceMachine():
         for files in os.walk(file_path):
             for file in files[-1]:
                 if 'price' in file and file.endswith('.csv'):
+                    # print(file)
                     with open(file, 'r', encoding='utf-8') as f:
                         rows = csv.DictReader(f)
                         for row in rows:
@@ -30,6 +31,7 @@ class PriceMachine():
                             row.setdefault('file_name', file)
                             self.data.append(row)
             self.name_length = len(max(self.data, key=lambda name: len(name['Наименование']))['Наименование'])
+            self.data.sort(key=lambda x: float(x['Цена']) / float(x['Вес']))
             return self.data
         '''
             Сканирует указанный каталог. Ищет файлы со словом price в названии.
@@ -74,21 +76,45 @@ class PriceMachine():
                 </tr>
         '''
         for number, item in enumerate(self.data):
-            product_name, price, weight, file_name = item
-            result+='<tr>'
-            result+=f'<td>{number+1}</td>'
-            result+=f'<td>{product_name}</td>'
-            result+=f'<td>{price}</td>'
-            result+=f'<td>{weight}</td>'
-            result+=f'<td>{file_name}</td>'
-            result+=f'<td>{float(price)*float(weight)}</td></tr>\n'
+            product_name, price, weight, file_name = item.values()
+            result += '<tr>'
+            result += f'<td>{number + 1}</td>'
+            result += f'<td>{product_name}</td>'
+            result += f'<td>{price}</td>'
+            result += f'<td>{weight}</td>'
+            result += f'<td>{file_name}</td>'
+            result += f'<td>{round(float(price) / float(weight), 2)}</td></tr>\n'
 
-        with open(fname,'w',encoding='utf-8') as fname:
-            fname.write(result)
-        return "Данные в "+str(fname)
+        with open(fname, 'w', encoding='utf-8') as fn:
+            fn.write(result)
+        return "Данные в " + str(fname)
 
     def find_text(self, text):
-        pass
+        data = []
+        for item in self.data:
+            if text in item['Наименование'].lower():
+                data.append(item)
+        if len(data) == 0:
+            print('Ничего не найдено.')
+            return
+        print(
+            f'{'№'.ljust(5, " ")}'
+            f'{'Наименование'.ljust(self.name_length, " ")}'
+            f'{'Цена'.center(6, " ")}'
+            f'{'Вес'.center(3, " ")}'
+            f'{"Файл".center(13, " ")}'
+            f'{'Цена за кг.'.center(9, ' ')}'
+        )
+
+        for i in range(1, len(data)):
+            print(
+                f'{str(i).ljust(5, " ")}'
+                f'{data[i]['Наименование'].ljust(self.name_length, " ")}'
+                f'{data[i]['Цена'].rjust(6, " ")}'
+                f'{data[i]['Вес'].rjust(3, " ")}'
+                f'{data[i]["file_name"].center(13, " ")}'
+                f'{str(round(float(data[i]['Цена']) / float(data[i]['Вес']), 2)).ljust(9, ' ')}'
+            )
 
 
 pm = PriceMachine()
@@ -97,8 +123,7 @@ print(pm.load_prices())
 for line in sys.stdin:
     if 'exit' in line[:-1].lower():
         print('the end')
-        print(pm.name_length)
         sys.exit()
-    pm.find_text(line[:-1])
+    pm.find_text(line[:-1].lower())
 
 print(pm.export_to_html())
