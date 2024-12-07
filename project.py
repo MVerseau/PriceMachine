@@ -5,7 +5,7 @@ import sys
 '''Использованы только проприетарные библиотеки.'''
 
 
-class PriceMachine():
+class PriceMachine:
 
     def __init__(self):
         self.data = []
