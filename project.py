@@ -15,15 +15,25 @@ class PriceMachine():
         good=['товар','название','наименование','продукт']
         price=['розница','цена']
         weight=['вес','масса','фасовка']
+        fields={'Наименование':good, 'Цена': price,'Вес':weight}
         for files in os.walk(file_path):
-            print(files)
             for file in files[-1]:
                 if 'price' in file and file.endswith('.csv'):
-                    with open(file, 'r', encoding='utf-8') as file:
-                        rows=csv.DictReader(file)
+                    with open(file, 'r', encoding='utf-8') as f:
+                        rows=csv.DictReader(f)
                         for row in rows:
                             row={k:v for k,v in row.items() if k in (good+price+weight)}
-                            print(row)
+                            for i in fields:
+                                for j in fields[i]:
+                                    if j in row.keys():
+                                        row[i]=row.pop(j)
+
+                            row.setdefault('file_name',file)
+                            # print(row)
+                            self.data.append(row)
+            # self.data.sort(key=lambda k:float(k['Цена за кг.']))
+            for i in self.data:
+                print(i)
             return self.data
         '''
             Сканирует указанный каталог. Ищет файлы со словом price в названии.
@@ -67,6 +77,9 @@ class PriceMachine():
                     <th>Цена за кг.</th>
                 </tr>
         '''
+        for number, item in enumerate(self.data):
+            product_name, price, weight,file_name=item
+
     
     def find_text(self, text):
         pass
