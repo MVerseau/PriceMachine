@@ -13,10 +13,9 @@ class PriceMachine:
         self.name_length = 0
 
     def load_prices(self, file_path=r'.'):
-        good = ['товар', 'название', 'наименование', 'продукт']
-        price = ['розница', 'цена']
-        weight = ['вес', 'масса', 'фасовка']
-        fields = {'Наименование': good, 'Цена': price, 'Вес': weight}
+
+        fields = {'Наименование': ['товар', 'название', 'наименование', 'продукт'], 'Цена': ['розница', 'цена'],
+                  'Вес': ['вес', 'масса', 'фасовка']}
         for files in os.walk(file_path):
             for file in files[-1]:
                 if 'price' in file and file.endswith('.csv'):
@@ -24,7 +23,7 @@ class PriceMachine:
                         rows = csv.DictReader(f)
                         # Приведение к единому формату {Наименование: наименование, Цена: цена, Вес: вес}
                         for row in rows:
-                            row = {k: v.lower() for k, v in row.items() if k in (good + price + weight)}
+                            row = {k: v.lower() for k, v in row.items() if k in (fields['Наименование'] + fields['Цена'] + fields['Вес'])}
                             for i in fields:
                                 for j in fields[i]:
                                     if j in row.keys():
