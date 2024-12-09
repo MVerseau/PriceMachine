@@ -29,9 +29,11 @@ class PriceMachine:
                                 for j in fields[i]:
                                     if j in row.keys():
                                         row[i] = row.pop(j)
+                            if self.name_length < len(row['Наименование']):
+                                self.name_length = len(row['Наименование'])
                             row.setdefault('file_name', file)
                             self.data.append(row)
-            self.name_length = len(max(self.data, key=lambda name: len(name['Наименование']))['Наименование'])
+            # self.name_length = len(max(self.data, key=lambda name: len(name['Наименование']))['Наименование'])
             self.data.sort(key=lambda x: float(x['Цена']) / float(x['Вес']))
             return self.data
 
@@ -99,14 +101,14 @@ class PriceMachine:
                 f'{data[i]["file_name"].center(13, " ")}'
                 f'{str(round(float(data[i]['Цена']) / float(data[i]['Вес']), 2)).ljust(9, ' ')}'
             )
-        print('\n'+'Введите слово или его часть для поиска продукта либо exit для выхода из программы: ')
+        print('\n' + 'Введите слово или его часть для поиска продукта либо exit для выхода из программы: ')
 
 
 pm = PriceMachine()
 print(pm.load_prices())
 
 if __name__ == '__main__':
-    print('\n'+'Введите слово или его часть для поиска продукта либо exit для выхода из программы: ')
+    print('\n' + 'Введите слово или его часть для поиска продукта либо exit для выхода из программы: ')
     for line in sys.stdin:
         if 'exit' in line[:-1].lower():
             print('\n' + 'the end' + '\n')
