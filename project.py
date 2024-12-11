@@ -23,7 +23,8 @@ class PriceMachine:
                         rows = csv.DictReader(f)
                         # Приведение к единому формату {Наименование: наименование, Цена: цена, Вес: вес}
                         for row in rows:
-                            row = {k: v.lower() for k, v in row.items() if k in (fields['Наименование'] + fields['Цена'] + fields['Вес'])}
+                            row = {k: v.lower() for k, v in row.items() if
+                                   k in (fields['Наименование'] + fields['Цена'] + fields['Вес'])}
                             for i in fields:
                                 for j in fields[i]:
                                     if j in row.keys():
@@ -75,31 +76,30 @@ class PriceMachine:
         return "Данные в " + str(fname)
 
     def find_text(self, text):
-        data = []
+        counter = 0
         for item in self.data:
             if text.lower() in item['Наименование'].lower():
-                data.append(item)
-        if len(data) == 0:
+                counter += 1
+                if counter == 1:
+                    print(
+                        f'{"№".ljust(5, " ")}'
+                        f'{"Наименование".ljust(self.name_length, " ")}'
+                        f'{"Цена".center(6, " ")}'
+                        f'{"Вес".center(3, " ")}'
+                        f'{"Файл".center(13, " ")}'
+                        f'{"Цена за кг.".center(9, " ")}')
+                print(
+                    f'{str(counter).ljust(5, " ")}'
+                    f'{item["Наименование"].ljust(self.name_length, " ")}'
+                    f'{item["Цена"].rjust(6, " ")}'
+                    f'{item["Вес"].rjust(3, " ")}'
+                    f'{item["file_name"].center(13, " ")}'
+                    f'{str(round(float(item["Цена"]) / float(item["Вес"]), 2)).ljust(9, " ")}'
+                )
+        if counter == 0:
             print('Ничего не найдено.')
             return
-        print(
-            f'{'№'.ljust(5, " ")}'
-            f'{'Наименование'.ljust(self.name_length, " ")}'
-            f'{'Цена'.center(6, " ")}'
-            f'{'Вес'.center(3, " ")}'
-            f'{"Файл".center(13, " ")}'
-            f'{'Цена за кг.'.center(9, ' ')}'
-        )
 
-        for i in range(len(data)):
-            print(
-                f'{str(i + 1).ljust(5, " ")}'
-                f'{data[i]['Наименование'].ljust(self.name_length, " ")}'
-                f'{data[i]['Цена'].rjust(6, " ")}'
-                f'{data[i]['Вес'].rjust(3, " ")}'
-                f'{data[i]["file_name"].center(13, " ")}'
-                f'{str(round(float(data[i]['Цена']) / float(data[i]['Вес']), 2)).ljust(9, ' ')}'
-            )
         print('\n' + 'Введите слово или его часть для поиска продукта либо exit для выхода из программы: ')
 
 
